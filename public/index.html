@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Saans — GenAI-Powered Winter Smog Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body id="top">
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">≋</span>
+        <span>
+          <span class="brand-name">saans</span>
+          <span class="brand-sub">WINTER SMOG ASSISTANT</span>
+        </span>
+      </a>
+
+      <nav class="main-nav" aria-label="Primary sections">
+        <a href="#forecast">Forecast</a>
+        <a href="#planner">Daily Plan</a>
+        <a href="#indoor">Indoor Air</a>
+        <a href="#commute">Commute &amp; Impact</a>
+        <a href="#ask">Ask Saans</a>
+        <a href="#community">Community</a>
+      </nav>
+
+      <div class="header-controls">
+        <label class="sr" for="quickCity">Quick city selector</label>
+        <select id="quickCity" class="city-select" aria-label="Select city"></select>
+        <button id="editProfileBtn" class="btn-secondary" disabled>Edit profile</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent" tabindex="-1">
+    <!-- Hero & Live AQI Card -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow hero-eyebrow">✦ GENAI-POWERED CLEAN-AIR ASSISTANT</p>
+          <h1>Make a plan.<br><em>Breathe easier.</em></h1>
+          <p class="hero-lead">
+            Turn air quality readings into personalized daily routines, indoor air steps,
+            and sustainable commutes — balancing what you breathe with what you emit.
+          </p>
+          <div id="heroBadges" class="hero-pills" aria-label="Household summary"></div>
+          <div class="sdg-strip" aria-label="Sustainable Development Goals">
+            <span class="sdg-chip">SDG 3 · Health</span>
+            <span class="sdg-chip">SDG 11 · Cities</span>
+            <span class="sdg-chip">SDG 13 · Climate</span>
+          </div>
+        </div>
+
+        <aside class="aqi-card" aria-label="Active Air Quality Reading">
+          <div class="aqi-card-top">
+            <div>
+              <span class="city-title" id="cityLabel">Delhi, India</span>
+              <span class="region-meta" id="regionLabel">NCR</span>
+            </div>
+            <span id="readingMode" class="pill-badge">Demo scenario</span>
+          </div>
+
+          <div class="aqi-readout">
+            <strong id="aqiValue" class="aqi-number">428</strong>
+            <div>
+              <span class="aqi-unit">INDIA AQI (CPCB)</span>
+              <b id="bandLabel" class="band-name">Severe</b>
+              <span id="bandSummary" class="band-summary"></span>
+            </div>
+          </div>
+
+          <div class="scale-wrap" aria-hidden="true">
+            <div class="scale-bar"></div>
+            <div id="aqiMarker" class="scale-marker"></div>
+          </div>
+          <div class="scale-labels">
+            <span>0 · Good</span>
+            <span>200 · Poor</span>
+            <span>500 · Severe</span>
+          </div>
+
+          <p id="readNote" class="read-note"></p>
+          <div class="aqi-actions">
+            <button id="enterAqiBtn" type="button" class="btn-ghost-light">Enter CPCB AQI</button>
+            <a href="https://app.cpcbccr.com/AQI_India/" target="_blank" rel="noopener noreferrer" class="link-light">Check live CPCB ↗</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="container main-stack">
+      <!-- Forecast Section -->
+      <section id="forecast" class="panel forecast-panel" aria-labelledby="forecastTitle">
+        <div class="forecast-info">
+          <p class="eyebrow">OUTDOOR AIR &amp; INVERSIONS</p>
+          <h2 id="forecastTitle">24-hour PM2.5 forecast</h2>
+          <p id="forecastStatus" role="status" class="muted">Loading forecast…</p>
+          <p id="windowAdvice" class="callout-box"></p>
+          <p id="inversionNote" class="micro-note"></p>
+          <div class="forecast-controls">
+            <label class="toggle-inline">
+              <input id="liveFeedToggle" type="checkbox">
+              <span>Use live Open-Meteo / CAMS feed</span>
+            </label>
+            <button id="refreshForecastBtn" type="button" class="btn-secondary">Refresh forecast</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div id="forecastBars" class="forecast-chart" role="list" aria-label="24-hour PM2.5 forecast"></div>
+          <div class="chart-legend">
+            <span><i class="dot dot-best"></i> Cleanest window</span>
+            <span><i class="dot dot-peak"></i> Peak inversion</span>
+            <span><i class="dot dot-mid"></i> Other hours (µg/m³)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dual Impact Differentiator -->
+      <section class="dual-banner" aria-label="Personal Exposure vs Environmental Emissions">
+        <div class="dual-col exposure-col">
+          <span class="dual-badge exposure-badge">PERSONAL EXPOSURE</span>
+          <h3>What your household breathes</h3>
+          <p>Driven by AQI timing, exertion level, indoor smoke sources, and filtration — protecting lungs and vulnerable groups today.</p>
+        </div>
+        <div class="dual-col emissions-col">
+          <span class="dual-badge emissions-badge">ENVIRONMENTAL EMISSIONS</span>
+          <h3>What your choices contribute</h3>
+          <p>Driven by transport mode, vehicle occupancy, cooking fuel, and local burning — cutting CO₂ and neighbourhood smog.</p>
+        </div>
+      </section>
+
+      <!-- Personalized Daily Planner -->
+      <section id="planner" class="section-block">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PERSONALIZED DAILY PLANNER</p>
+            <h2>Today’s routine &amp; action plan</h2>
+          </div>
+          <div class="progress-wrap">
+            <span id="profileTag" class="tag">Sensitive household</span>
+            <span id="checklistProgress" class="progress-pill">0 / 5 done today</span>
+          </div>
+        </div>
+
+        <div id="timelineGrid" class="timeline-grid"></div>
+        <div id="actionCards" class="cards-grid"></div>
+      </section>
+
+      <!-- Indoor Air Advisor -->
+      <section id="indoor" class="panel section-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">INDOOR AIR ADVISOR</p>
+            <h2>Affordable ways to clean indoor air</h2>
+            <p id="indoorSummary" class="muted"></p>
+          </div>
+          <div class="readiness-box">
+            <span class="readiness-label">Indoor Readiness</span>
+            <strong id="readinessScore">--%</strong>
+            <span id="readinessBadge" class="tag"></span>
+          </div>
+        </div>
+
+        <div class="filter-bar" role="tablist" aria-label="Filter indoor recommendations by cost">
+          <button type="button" role="tab" aria-selected="true" class="filter-chip active" data-tier="all">All steps</button>
+          <button type="button" role="tab" aria-selected="false" class="filter-chip" data-tier="free">₹0 Habits</button>
+          <button type="button" role="tab" aria-selected="false" class="filter-chip" data-tier="diy">Low-Cost / DIY</button>
+          <button type="button" role="tab" aria-selected="false" class="filter-chip" data-tier="equipment">Appliances</button>
+        </div>
+
+        <div id="indoorCards" class="indoor-grid"></div>
+      </section>
+
+      <!-- Commute Comparison, Smart Matrix & Impact Tracker -->
+      <section id="commute" class="commute-grid">
+        <div class="panel section-panel">
+          <p class="eyebrow">SUSTAINABLE COMMUTE &amp; IMPACT CALCULATOR</p>
+          <h2>Compare emissions &amp; smog exposure</h2>
+          <p class="muted">See daily, monthly, and annual CO₂ avoided — plus whether today’s smog creates an exposure trade-off.</p>
+
+          <form id="impactForm" class="fields-grid">
+            <label>Current mode
+              <select id="fromMode"></select>
+            </label>
+            <label>Alternative mode
+              <select id="toMode"></select>
+            </label>
+            <label>Round trip (km)
+              <input id="tripKm" type="number" min="1" max="300" step="any" value="12" required>
+            </label>
+            <label>Car / auto occupants
+              <input id="tripOccupants" type="number" min="1" max="7" step="1" value="1" required>
+            </label>
+          </form>
+
+          <div id="impactOutput" class="impact-output" aria-live="polite">
+            <div class="impact-kpis">
+              <div class="kpi-box">
+                <span class="kpi-label">Daily CO₂ change</span>
+                <strong id="dailyDelta">--</strong>
+              </div>
+              <div class="kpi-box">
+                <span class="kpi-label">Monthly (22 days)</span>
+                <strong id="monthlyDelta">--</strong>
+              </div>
+              <div class="kpi-box">
+                <span class="kpi-label">Annual (240 days)</span>
+                <strong id="annualDelta">--</strong>
+              </div>
+            </div>
+            <div id="exposureCompare" class="exposure-compare"></div>
+            <div id="tradeoffBanner" class="tradeoff-banner" hidden></div>
+          </div>
+
+          <div class="button-row">
+            <button id="logTripBtn" type="button" class="btn-primary" disabled>Log this switch</button>
+            <span id="tripStatus" role="status" class="status-text"></span>
+          </div>
+
+          <div class="matrix-wrap">
+            <h3>Smart commute options for today’s AQI</h3>
+            <p class="micro-note">Click any row to load it into the calculator above.</p>
+            <div id="commuteMatrix" class="matrix-list"></div>
+          </div>
+        </div>
+
+        <div class="panel section-panel">
+          <div class="section-head-compact">
+            <div>
+              <p class="eyebrow">IMPACT TRACKER</p>
+              <h2>Your commute log</h2>
+            </div>
+            <button id="clearTripsBtn" type="button" class="btn-secondary" disabled>Clear history</button>
+          </div>
+
+          <div class="tracker-stats">
+            <div class="stat-tile">
+              <span class="kpi-label">CO₂ avoided</span>
+              <strong id="statAvoided">0.00 kg</strong>
+            </div>
+            <div class="stat-tile">
+              <span class="kpi-label">Sustainable km</span>
+              <strong id="statKm">0 km</strong>
+            </div>
+            <div class="stat-tile">
+              <span class="kpi-label">Switches logged</span>
+              <strong id="statCount">0</strong>
+            </div>
+          </div>
+
+          <ul id="tripsList" class="trips-list" aria-label="Logged commute switches"></ul>
+
+          <p class="micro-note">
+            Operating CO₂ uses deterministic <a href="https://indiaghgp.org/sites/default/files/Road%20Transport%20Technical%20Paper.pdf" target="_blank" rel="noopener noreferrer">India GHG Program factors</a> per traveller. Personal exposure reflects cabin enclosure &amp; breathing rate.
+          </p>
+        </div>
+      </section>
+
+      <!-- Ask Saans GenAI Assistant -->
+      <section id="ask" class="panel section-panel">
+        <div class="section-head-compact">
+          <div>
+            <p class="eyebrow">✦ EVIDENCE-GROUNDED ASSISTANT</p>
+            <h2>Ask Saans</h2>
+            <p class="muted">Get practical, source-cited answers tailored to your household profile and today’s air quality.</p>
+          </div>
+          <button id="clearChatBtn" type="button" class="btn-secondary">Clear chat</button>
+        </div>
+
+        <div class="chips-row" aria-label="Suggested questions">
+          <button type="button" class="chip-btn" data-question="Can children play outside today?">Children outdoor play</button>
+          <button type="button" class="chip-btn" data-question="How can I improve indoor air on a budget?">Budget indoor air</button>
+          <button type="button" class="chip-btn" data-question="Should I cycle or take the Metro in this smog?">Cycle vs Metro</button>
+          <button type="button" class="chip-btn" data-question="When should we open windows today?">Ventilation timing</button>
+          <button type="button" class="chip-btn" data-question="Which masks work for winter smog?">N95 masks</button>
+          <button type="button" class="chip-btn" data-question="Why is smog worse in the morning?">Winter inversions</button>
+        </div>
+
+        <div id="chatLog" class="chat-log" aria-live="polite"></div>
+
+        <form id="askForm" class="ask-form">
+          <label class="sr" for="questionInput">Ask Saans a question</label>
+          <input id="questionInput" type="text" maxlength="400" placeholder="Ask about outdoor play, cooking smoke, masks, or commuting…" required>
+          <button type="submit" class="btn-primary">Ask Saans</button>
+        </form>
+
+        <div class="ask-footer">
+          <label id="aiChoice" class="toggle-inline" hidden>
+            <input id="useAI" type="checkbox">
+            <span>Enhance synthesis with OpenAI (uses only city, AQI, and general household setup — no personal IDs)</span>
+          </label>
+          <span class="micro-note">Medical emergencies or chest pain/breathing difficulty are routed immediately to urgent care guidance.</span>
+        </div>
+      </section>
+
+      <!-- Community Actions Builder -->
+      <section id="community" class="panel section-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">COLLECTIVE ACTION</p>
+            <h2>Community clean-air action builder</h2>
+            <p class="muted">Select pledges for your residential society, school, or office and export a privacy-safe plan (never shares your personal household details).</p>
+          </div>
+          <div class="audience-tabs" role="tablist" aria-label="Community group type">
+            <button type="button" role="tab" aria-selected="true" class="filter-chip active" data-audience="rwa">RWA / Society</button>
+            <button type="button" role="tab" aria-selected="false" class="filter-chip" data-audience="school">School &amp; Parents</button>
+            <button type="button" role="tab" aria-selected="false" class="filter-chip" data-audience="workplace">Workplace</button>
+          </div>
+        </div>
+
+        <div class="community-grid">
+          <div id="communityChecklist" class="community-checklist"></div>
+          <div class="community-preview-card">
+            <h3>Shareable community plan</h3>
+            <pre id="communityPreview" class="community-preview"></pre>
+            <div class="button-row">
+              <button id="copyPlanBtn" type="button" class="btn-primary">Copy plan</button>
+              <button id="downloadPlanBtn" type="button" class="btn-secondary">Download .txt</button>
+              <span id="shareStatus" role="status" class="status-text"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Research Findings & SDGs -->
+      <section class="research-grid" aria-label="Winter Smog Research & Sustainable Development Goals">
+        <div class="panel section-panel">
+          <p class="eyebrow">SCIENTIFIC CONTEXT</p>
+          <h2>Key winter smog insights</h2>
+          <div id="scienceList" class="info-stack"></div>
+        </div>
+        <div class="panel section-panel">
+          <p class="eyebrow">GLOBAL ALIGNMENT</p>
+          <h2>Sustainable Development Goals</h2>
+          <div id="sdgList" class="info-stack"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <strong>saans · v2</strong>
+      <div class="footer-links">
+        <a href="https://app.cpcbccr.com/AQI_India/" target="_blank" rel="noopener noreferrer">CPCB AQI</a>
+        <a href="https://ncdc.mohfw.gov.in/uploads/pdf/Enclosure%201.%20DO%20letter%20from%20Secretary%2C%20DoHFW%20to%20CS_AP%20Advisory_2025.pdf" target="_blank" rel="noopener noreferrer">MoHFW Health Advisory</a>
+        <a href="https://www.epa.gov/indoor-air-quality-iaq/air-cleaners-and-air-filters-home" target="_blank" rel="noopener noreferrer">EPA Indoor Air</a>
+        <a href="https://hero.epa.gov/reference/3076247/" target="_blank" rel="noopener noreferrer">Commute Exposure Study</a>
+        <a href="https://open-meteo.com/en/docs/air-quality-api" target="_blank" rel="noopener noreferrer">Open-Meteo / CAMS</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Household Profile Modal -->
+  <dialog id="profileDialog" aria-labelledby="dialogTitle">
+    <form id="profileForm">
+      <p class="eyebrow">PERSONALIZE YOUR PLAN</p>
+      <h2 id="dialogTitle">Household profile</h2>
+      <p class="muted">Saved to this local session. Optionally enter a live CPCB station reading to override the simulated city scenario.</p>
+
+      <div class="fields-grid">
+        <label>City
+          <select id="profileCity"></select>
+        </label>
+        <label>Usual commute
+          <select id="profileCommute"></select>
+        </label>
+        <label>Official India AQI (0–500, optional)
+          <input id="manualAqi" type="number" min="0" max="500" placeholder="Leave blank for demo scenario">
+        </label>
+        <label>Reading time (local)
+          <input id="readingTime" type="datetime-local">
+        </label>
+        <label>Primary cooking fuel
+          <select id="profileFuel">
+            <option value="gas">LPG / Piped gas</option>
+            <option value="electric">Electric / Induction</option>
+            <option value="solid">Wood, coal, or solid fuel</option>
+          </select>
+        </label>
+        <label>Indoor upgrade budget
+          <select id="profileBudget">
+            <option value="low">Zero-cost &amp; DIY priority</option>
+            <option value="moderate">Moderate (filters &amp; masks)</option>
+            <option value="flexible">Flexible (HEPA purifier / appliances)</option>
+          </select>
+        </label>
+      </div>
+
+      <fieldset class="fieldset-box">
+        <legend>Household members needing extra protection</legend>
+        <div id="vulnerableCheckboxes" class="checkbox-grid"></div>
+      </fieldset>
+
+      <fieldset class="fieldset-box">
+        <legend>Available home equipment</legend>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" id="hasPurifier"> Portable HEPA purifier</label>
+          <label class="checkbox-item"><input type="checkbox" id="hasExhaust"> Outdoor-vented kitchen exhaust</label>
+          <label class="checkbox-item"><input type="checkbox" id="hasMasks"> Stock of fitted N95 / KN95 masks</label>
+          <label class="checkbox-item"><input type="checkbox" id="hasAc"> Split AC / recirculation cooling</label>
+        </div>
+      </fieldset>
+
+      <p id="profileError" class="error-text" role="status"></p>
+
+      <div class="dialog-actions">
+        <button type="button" id="clearManualBtn" class="btn-secondary">Clear manual AQI</button>
+        <div class="dialog-right">
+          <button type="button" id="cancelProfileBtn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Save profile</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
